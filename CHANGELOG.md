@@ -28,6 +28,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added documentation comment explaining _PATH variable in bowerbird.mk.
 - Added include guard to prevent "overriding commands for target" warnings when
   bowerbird-deps.mk is included multiple times.
+- Added parameter validation to `bowerbird::git-dependency` macro with clear error messages
+  for missing required parameters.
+- Added network timeout configuration to git clone (lowSpeedLimit=1000, lowSpeedTime=60)
+  to prevent indefinite hangs on network issues.
+- Added comprehensive documentation for development mode in README with usage examples.
 ### Changed
 - Updated the usage of bowerbird::git-dependency to no longer need the pattern
   `$(eval $(call ... ))` and can instead simply use `$(call ...)`.

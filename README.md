@@ -25,6 +25,36 @@ include $(BOWERBIRD_DEPS.MK)
 $(call bowerbird::git-dependency,<id>,<url>,<version>,<entry>)
 ```
 
+## Development Mode
+
+For local development of dependencies, you can use the `--bowerbird-dev-mode` flag to preserve full git history:
+
+```bash
+make -- --bowerbird-dev-mode <target>
+```
+
+**Normal Mode (default):**
+- Performs shallow clone (`--depth 1`)
+- Removes `.git` directories after cloning
+- Faster, smaller downloads
+- Prevents accidental commits to dependencies
+
+**Development Mode:**
+- Performs full clone with complete git history
+- Preserves `.git` directories
+- Allows local modifications and commits
+- Useful for developing and testing dependency changes
+
+### Examples
+
+```bash
+# Normal mode - shallow clone, no .git
+make check
+
+# Development mode - full clone, keep .git
+make check -- --bowerbird-dev-mode
+```
+
 ## Macros
 
 ### `bowerbird::git-dependency`

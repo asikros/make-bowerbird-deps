@@ -57,7 +57,13 @@ endif
 #               main,bowerbird.mk))
 #
 define bowerbird::git-dependency
-$(eval $(call bowerbird::deps::git-dependency-implementation,$1,$2,$3,$4))
+$(eval \
+    $(if $1,,$(error ERROR: 'path' parameter is required)) \
+    $(if $2,,$(error ERROR: 'url' parameter is required)) \
+    $(if $3,,$(error ERROR: 'version' parameter is required)) \
+    $(if $4,,$(error ERROR: 'entry' parameter is required)) \
+    $(call bowerbird::deps::git-dependency-implementation,$1,$2,$3,$4) \
+)
 endef
 
 # bowerbird::deps::git-dependency-implementation,<path>,<url>,<version>,<entry>
@@ -88,7 +94,10 @@ define bowerbird::deps::git-dependency-implementation
     $$(eval $$(call bowerbird::deps::define-dependency-constants,BOWERBIRD_DEPENDENCY/$1,$2,$3,$1,$4))
     $$(BOWERBIRD_DEPENDENCY/$1/PATH)/.:
 		$$(if $(__BOWERBIRD_KEEP_GIT),@echo "INFO: Cloning dependency in DEV mode: $$(BOWERBIRD_DEPENDENCY/$1/URL)")
-		@git clone --config advice.detachedHead=false $$(__BOWERBIRD_CLONE_DEPTH) \
+		@git clone --config advice.detachedHead=false \
+				--config http.lowSpeedLimit=1000 \
+				--config http.lowSpeedTime=60 \
+				$$(__BOWERBIRD_CLONE_DEPTH) \
 				--branch $$(BOWERBIRD_DEPENDENCY/$1/VERSION) \
 				$$(BOWERBIRD_DEPENDENCY/$1/URL) \
 				$$(BOWERBIRD_DEPENDENCY/$1/PATH) || \

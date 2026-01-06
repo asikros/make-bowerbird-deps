@@ -1,9 +1,43 @@
+# --bowerbird-dev-mode
+#
+#   Optional flag for enabling development mode when cloning dependencies.
+#   In development mode, git repositories are cloned with full history and
+#   .git directories are preserved, allowing for local modifications and commits.
+#
+#   Include guard to prevent "overriding commands for target" warnings when this file
+#   is included multiple times.
+#
+#   Example:
+#       make <target> -- --bowerbird-dev-mode
+#
+ifndef __BOWERBIRD_DEPS_FLAGS_DEFINED
+__BOWERBIRD_DEPS_FLAGS_DEFINED := 1
+
+__BOWERBIRD_DEV_FLAG = --bowerbird-dev-mode
+.PHONY: $(__BOWERBIRD_DEV_FLAG)
+$(__BOWERBIRD_DEV_FLAG):
+	@:
+
+endif
+
+# Set clone depth based on dev mode flag
+ifneq ($(filter $(__BOWERBIRD_DEV_FLAG),$(MAKECMDGOALS)),)
+    __BOWERBIRD_CLONE_DEPTH :=
+    __BOWERBIRD_KEEP_GIT := 1
+    export __BOWERBIRD_KEEP_GIT
+else
+    __BOWERBIRD_CLONE_DEPTH := --depth 1
+    __BOWERBIRD_KEEP_GIT :=
+endif
+
 # bowerbird::git-dependency,<path>,<url>,<version>,<entry>
 #
 #   Installs a bowerbird compatible git dependency for immediate use. This command will
 #   clone the dependency repo from the designated URL location into the specified path.
-#   The commands performs a shallow clone and deletes the git history of the clone to
-#   prevent against accidental changes in the cloned repo.
+#
+#   By default, performs a shallow clone and deletes the git history to prevent
+#   accidental changes. When --dev flag is used, performs a full clone and keeps
+#   the .git directory for development purposes.
 #
 #   Args:
 #       path: Path where the dependency repo is cloned.
@@ -53,23 +87,23 @@ endef
 define bowerbird::deps::git-dependency-implementation
     $$(eval $$(call bowerbird::deps::define-dependency-constants,BOWERBIRD_DEPENDENCY/$1,$2,$3,$1,$4))
     $$(BOWERBIRD_DEPENDENCY/$1/PATH)/.:
-		@git clone --config advice.detachedHead=false --depth 1 \
+		$$(if $(__BOWERBIRD_KEEP_GIT),@echo "INFO: Cloning dependency in DEV mode: $$(BOWERBIRD_DEPENDENCY/$1/URL)")
+		@git clone --config advice.detachedHead=false $$(__BOWERBIRD_CLONE_DEPTH) \
 				--branch $$(BOWERBIRD_DEPENDENCY/$1/VERSION) \
 				$$(BOWERBIRD_DEPENDENCY/$1/URL) \
 				$$(BOWERBIRD_DEPENDENCY/$1/PATH) || \
-        (echo ERROR: Failed to clone dependency '$$(BOWERBIRD_DEPENDENCY/$1/URL)' && exit 1)
-		@test -n $$(BOWERBIRD_DEPENDENCY/$1/PATH)
-		@test -d $$(BOWERBIRD_DEPENDENCY/$1/PATH)/.git
-		@rm -rf $$(BOWERBIRD_DEPENDENCY/$1/PATH)/.git
+        (>&2 echo "ERROR: Failed to clone dependency '$$(BOWERBIRD_DEPENDENCY/$1/URL)'" && exit 1)
+		@test -n "$$(BOWERBIRD_DEPENDENCY/$1/PATH)"
+		@test -d "$$(BOWERBIRD_DEPENDENCY/$1/PATH)/.git"
+		$$(if $(__BOWERBIRD_KEEP_GIT),,@\rm -rfv -- "$$(BOWERBIRD_DEPENDENCY/$1/PATH)/.git")
 
 
     $$(BOWERBIRD_DEPENDENCY/$1.MK): | $$(BOWERBIRD_DEPENDENCY/$1/PATH)/.
 		@test -d $$|
 		@test -f $$@ || (\
 			\rm -rf $$(BOWERBIRD_DEPENDENCY/$1/PATH) && \
-			>&2 echo "\nERROR: Expected entry point not found: $$@ \
-			\nrm -rf $$(BOWERBIRD_DEPENDENCY/$1/PATH)\n" \
-			&& exit 1\
+			>&2 echo "ERROR: Expected entry point not found: $$@" && \
+			exit 1\
 		)
 
     include $$(BOWERBIRD_DEPENDENCY/$1.MK)
@@ -117,7 +151,7 @@ endef
 #       Raises an error if the value for any of the constants is different than
 #           previously supplied values.
 #
-define bowerbird::deps::define-dependency-constants # id, url, vesion, path, entry
+define bowerbird::deps::define-dependency-constants # id, url, version, path, entry
     $$(eval $$(call bowerbird::deps::define-constant,$1/URL,$2))
     $$(eval $$(call bowerbird::deps::define-constant,$1/VERSION,$3))
     $$(eval $$(call bowerbird::deps::define-constant,$1/PATH,$$(abspath $4)))

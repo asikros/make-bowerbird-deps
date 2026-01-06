@@ -1,4 +1,4 @@
-# Constants
+# Error Checking
 WORKDIR_DEPS ?= $(error ERROR: Undefined variable WORKDIR_DEPS)
 
 # Load Dependencies

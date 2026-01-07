@@ -33,10 +33,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added network timeout configuration to git clone (lowSpeedLimit=1000, lowSpeedTime=60)
   to prevent indefinite hangs on network issues.
 - Added comprehensive documentation for development mode in README with usage examples.
+- Added command-line override support for all dependency parameters via `<name>.<param>=<value>`
+  syntax, allowing runtime customization without modifying makefiles.
+- Added `test-override.mk` with 12 comprehensive test cases covering override functionality,
+  error handling, and edge cases.
+- Added Google-style docstring format to all macros, targets, and tests for improved
+  documentation consistency.
+- Added flexible keyword argument parser supporting both compact and spaced syntax.
+
 ### Changed
 - Updated the usage of bowerbird::git-dependency to no longer need the pattern
   `$(eval $(call ... ))` and can instead simply use `$(call ...)`.
 - Updated comment header in make/deps.mk from "Constants" to "Error Checking" for clarity.
+- Updated all test documentation to use appropriate "Raises:" sections for error tests instead
+  of "Returns:" or "Verifies:".
+- Updated README with comprehensive documentation of new keyword syntax, command-line overrides,
+  and usage examples.
+- `bowerbird::git-dependency` now requires keyword arguments instead of positional
+  arguments. Old syntax: `$(call bowerbird::git-dependency,path,url,version,entry)`.
+  New syntax: `$(call bowerbird::git-dependency, name=<name>, path=<path>, url=<url>,
+  branch=<branch>, entry=<entry>)`.
+- Added required `name` parameter for command-line override support. This parameter
+  identifies the dependency for runtime overrides.
+- Replaced `version` parameter with mutually exclusive `branch` and `revision`
+  parameters for clearer intent. Use `branch=<tag-or-branch>` for branches/tags, or
+  `revision=<sha>` for specific commits.
+- Dependencies must specify exactly one of `branch` or `revision` (not both,
+  not neither). This ensures explicit version specification.
+
 ### Deprecated
 ### Fixed
 - Wrapped the git-dependency command in an `ifdef` to avoid undefined variable warning
@@ -49,6 +73,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed typo in bowerbird::deps::define-dependency-constants comment: "vesion" → "version".
 - Standardized all error messages to use stderr (>&2) consistently.
 - Fixed error message formatting to remove extra newlines and inconsistent output.
+- Fixed keyword argument parser to handle flexible spacing (both compact and spaced syntax).
+- Fixed undefined variable warnings in parser by using conditional concatenation.
+
 ### Security
 - Added comprehensive safety checks to private_clean target to prevent accidental deletion
   of critical directories (root, HOME, or paths outside project directory).

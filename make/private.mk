@@ -22,6 +22,18 @@ include make/deps.mk
 include bowerbird.mk
 
 # Targets
+
+# private_clean
+#
+#	Removes build artifacts and temporary directories (WORKDIR_DEPS, WORKDIR_ROOT, WORKDIR_TEST)
+#	with safety checks.
+#
+#	Validates each path before deletion to prevent accidental removal of:
+#		Root directory (/).
+#		Home directory ($HOME).
+#		Directories outside the project.
+#		Empty paths.
+#
 .PHONY: private_clean
 private_clean: PATHS_CLEAN = $(WORKDIR_DEPS) $(WORKDIR_ROOT) $(WORKDIR_TEST)
 private_clean:

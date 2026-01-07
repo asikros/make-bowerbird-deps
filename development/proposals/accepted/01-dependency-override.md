@@ -1,9 +1,13 @@
 # Complete Dependency Override System
 
-> **Status**: Accepted
-> **Project**: make-bowerbird-deps
-> **Created**: 2025-12-20
-> **Author**: Bowerbird Team
+```
+Status:   Accepted
+Project:  make-bowerbird-deps
+Created:  2025-12-20
+Author:   Bowerbird Team
+```
+
+---
 
 ## Overview
 

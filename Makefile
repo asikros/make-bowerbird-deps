@@ -1,7 +1,8 @@
-# Constants
-.DEFAULT_GOAL := help
+# Project
+NAME := bowerbird-deps
+VERSION := $(shell git describe --always --dirty --broken 2> /dev/null || echo "unknown")
 
-#Targets
+# Targets
 .PHONY: check
 ## Runs the repository tests
 check: private_test

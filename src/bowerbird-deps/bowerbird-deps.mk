@@ -40,6 +40,15 @@ space := $(empty) $(empty)
 # Keyword arguments limit (we support one less than this value)
 KEYWORD_ARGS_LIMIT := 11
 
+# Note on local kwargs implementation:
+#   We maintain a local kwargs parser instead of using bowerbird-libs because
+#   bowerbird-deps.mk must be self-contained to bootstrap the dependency system.
+#   This file is included before any dependencies (including bowerbird-libs) are loaded,
+#   and we use it to load those dependencies, creating a chicken-and-egg problem.
+#
+#   The implementation here is intentionally minimal. For full-featured kwargs handling
+#   with helpers like kwargs-require and kwargs-default, see bowerbird-libs.
+
 # bowerbird::deps::parse-keyword-args
 #
 #	Parses keyword arguments with flexible spacing.

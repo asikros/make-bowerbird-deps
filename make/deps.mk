@@ -9,6 +9,13 @@ WORKDIR_DEPS ?= $(error ERROR: Undefined variable WORKDIR_DEPS)
 include src/bowerbird-deps/bowerbird-deps.mk
 
 $(call bowerbird::git-dependency, \
+	name=bowerbird-libs, \
+	path=$(WORKDIR_DEPS)/bowerbird-libs, \
+	url=https://github.com/asikros/make-bowerbird-libs.git, \
+	branch=main, \
+	entry=bowerbird.mk)
+
+$(call bowerbird::git-dependency, \
 	name=bowerbird-help, \
 	path=$(WORKDIR_DEPS)/bowerbird-help, \
 	url=https://github.com/asikros/make-bowerbird-help.git, \

@@ -1,4 +1,4 @@
-# Error Checking
+# Constants
 WORKDIR_DEPS ?= $(error ERROR: Undefined variable WORKDIR_DEPS)
 
 # Dependencies
@@ -9,22 +9,22 @@ WORKDIR_DEPS ?= $(error ERROR: Undefined variable WORKDIR_DEPS)
 include src/bowerbird-deps/bowerbird-deps.mk
 
 $(call bowerbird::git-dependency, \
-    name=bowerbird-help, \
-    path=$(WORKDIR_DEPS)/bowerbird-help, \
-    url=https://github.com/asikros/make-bowerbird-help.git, \
-    branch=main, \
-    entry=bowerbird.mk)
+	name=bowerbird-help, \
+	path=$(WORKDIR_DEPS)/bowerbird-help, \
+	url=https://github.com/asikros/make-bowerbird-help.git, \
+	branch=main, \
+	entry=bowerbird.mk)
 
 $(call bowerbird::git-dependency, \
-    name=bowerbird-githooks, \
-    path=$(WORKDIR_DEPS)/bowerbird-githooks, \
-    url=https://github.com/asikros/make-bowerbird-githooks.git, \
-    branch=main, \
-    entry=bowerbird.mk)
+	name=bowerbird-githooks, \
+	path=$(WORKDIR_DEPS)/bowerbird-githooks, \
+	url=https://github.com/asikros/make-bowerbird-githooks.git, \
+	branch=main, \
+	entry=bowerbird.mk)
 
 $(call bowerbird::git-dependency, \
-    name=bowerbird-test, \
-    path=$(WORKDIR_DEPS)/bowerbird-test, \
-    url=https://github.com/asikros/make-bowerbird-test.git, \
-    branch=main, \
-    entry=bowerbird.mk)
+	name=bowerbird-test, \
+	path=$(WORKDIR_DEPS)/bowerbird-test, \
+	url=https://github.com/asikros/make-bowerbird-test.git, \
+	branch=main, \
+	entry=bowerbird.mk)

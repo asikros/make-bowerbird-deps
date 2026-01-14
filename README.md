@@ -1,6 +1,6 @@
 # Bowerbird Dependency Tools
 
-[![Makefile CI](https://github.com/ic-designer/make-bowerbird-deps/actions/workflows/makefile.yml/badge.svg)](https://github.com/ic-designer/make-bowerbird-deps/actions/workflows/makefile.yml)
+[![Makefile CI](https://github.com/asikros/make-bowerbird-deps/actions/workflows/makefile.yml/badge.svg)](https://github.com/asikros/make-bowerbird-deps/actions/workflows/makefile.yml)
 
 
 ## Usage
@@ -19,14 +19,14 @@ WORKDIR_DEPS ?= $(error ERROR: Undefined variable WORKDIR_DEPS)
 BOWERBIRD_DEPS.MK := $(WORKDIR_DEPS)/BOWERBIRD_DEPS/bowerbird_deps.mk
 $(BOWERBIRD_DEPS.MK):
 	@curl --silent --show-error --fail --create-dirs -o $@ -L \
-https://raw.githubusercontent.com/ic-designer/make-bowerbird-deps/main/src/bowerbird-deps/bowerbird-deps.mk
+https://raw.githubusercontent.com/asikros/make-bowerbird-deps/main/src/bowerbird-deps/bowerbird-deps.mk
 include $(BOWERBIRD_DEPS.MK)
 
 # Declare Dependencies
 $(call bowerbird::git-dependency, \
     name=bowerbird-help, \
     path=$(WORKDIR_DEPS)/bowerbird-help, \
-    url=https://github.com/ic-designer/make-bowerbird-help.git, \
+    url=https://github.com/asikros/make-bowerbird-help.git, \
     branch=main, \
     entry=bowerbird.mk)
 ```
@@ -141,7 +141,7 @@ $(call bowerbird::git-dependency, \
 $(call bowerbird::git-dependency, \
     name=bowerbird-help, \
     path=$(WORKDIR_DEPS)/bowerbird-help, \
-    url=https://github.com/ic-designer/make-bowerbird-help.git, \
+    url=https://github.com/asikros/make-bowerbird-help.git, \
     branch=main, \
     entry=bowerbird.mk)
 
@@ -149,7 +149,7 @@ $(call bowerbird::git-dependency, \
 $(call bowerbird::git-dependency, \
     name=bowerbird-test, \
     path=$(WORKDIR_DEPS)/bowerbird-test, \
-    url=https://github.com/ic-designer/make-bowerbird-test.git, \
+    url=https://github.com/asikros/make-bowerbird-test.git, \
     revision=abc123def456, \
     entry=bowerbird.mk)
 

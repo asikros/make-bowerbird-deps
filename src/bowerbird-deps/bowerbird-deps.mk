@@ -17,7 +17,7 @@ __BOWERBIRD_DEPS_FLAGS_DEFINED := 1
 
 __BOWERBIRD_DEV_FLAG = --bowerbird-dev-mode
 .PHONY: $(__BOWERBIRD_DEV_FLAG)
-$(__BOWERBIRD_DEV_FLAG):
+$(__BOWERBIRD_DEV_FLAG): ## Enables development mode (keeps .git history for dependencies)
 	@:
 
 endif

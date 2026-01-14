@@ -1,51 +1,69 @@
-# Tests for --bowerbird-dev-mode flag
-
-# test-dev-mode-shallow-clone
+# Mock tests for --bowerbird-dev-mode flag
 #
-#	Tests default shallow clone behavior (without dev mode flag).
-#	Verifies dependency is cloned with --depth 1 and .git directory is removed.
-#
-test-dev-mode-shallow-clone:
-	@echo "Running test-dev-mode-shallow-clone (normal mode)"
-	test ! -d $(WORKDIR_TEST)/$@/deps/test-repo || rm -rf $(WORKDIR_TEST)/$@/deps/test-repo
-	test ! -d $(WORKDIR_TEST)/$@/deps/test-repo
-	$(MAKE) FORCE TEST_DEV_MODE_SHALLOW_CLONE=true
-	test -d $(WORKDIR_TEST)/$@/deps/test-repo
-	! test -d $(WORKDIR_TEST)/$@/deps/test-repo/.git
+# These tests verify that bowerbird::git-dependency generates correct
+# git clone commands with and without dev mode, using the mock shell.
 
-ifdef TEST_DEV_MODE_SHALLOW_CLONE
-    $(call bowerbird::git-dependency, \
-        name=test-dev-mode-shallow, \
-        path=$(WORKDIR_TEST)/test-dev-mode-shallow-clone/deps/test-repo, \
-        url=https://github.com/ic-designer/make-bowerbird-deps.git, \
-        branch=main, \
-        entry=bowerbird.mk)
+test-dev-mode-mock-shallow-clone: $(WORKDIR_TEST)/test-dev-mode-mock-shallow-clone/mock-shell.bash
+	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
+	@mkdir -p $(WORKDIR_TEST)/$@
+	@cat /dev/null > $(WORKDIR_TEST)/$@/results
+	$(MAKE) -j1 BOWERBIRD_MOCK_RESULTS=$(WORKDIR_TEST)/$@/results \
+		TEST_DEV_MODE_MOCK_SHALLOW_CLONE=true \
+		$(WORKDIR_TEST)/$@/mock-dep/.
+	$(call bowerbird::test::compare-file-content-from-var,$(WORKDIR_TEST)/$@/results,expected-dev-mode-mock-shallow-clone)
+
+ifdef TEST_DEV_MODE_MOCK_SHALLOW_CLONE
+$(eval $(call bowerbird::git-dependency, \
+    name=mock-dep-shallow, \
+    path=$(WORKDIR_TEST)/test-dev-mode-mock-shallow-clone/mock-dep, \
+    url=https://github.com/asikros/make-bowerbird-deps.git, \
+    branch=main, \
+    entry=bowerbird.mk))
+
+$(WORKDIR_TEST)/test-dev-mode-mock-shallow-clone/mock-dep/bowerbird.mk: | $(WORKDIR_TEST)/test-dev-mode-mock-shallow-clone/mock-dep/.
+	@mkdir -p $(dir $@)
+	@touch $@
 endif
 
-# test-dev-mode-full-clone
-#
-#	Tests full clone behavior with --bowerbird-dev-mode flag.
-#	Verifies dependency is cloned with full git history, .git directory is preserved,
-#	and git config file exists.
-#
-test-dev-mode-full-clone:
-	@echo "Running test-dev-mode-full-clone (dev mode)"
-	test ! -d $(WORKDIR_TEST)/$@/deps/test-repo || rm -rf $(WORKDIR_TEST)/$@/deps/test-repo
-	test ! -d $(WORKDIR_TEST)/$@/deps/test-repo
-	$(MAKE) FORCE TEST_DEV_MODE_FULL_CLONE=true -- --bowerbird-dev-mode
-	test -d $(WORKDIR_TEST)/$@/deps/test-repo
-	test -d $(WORKDIR_TEST)/$@/deps/test-repo/.git
-	test -f $(WORKDIR_TEST)/$@/deps/test-repo/.git/config
+define __expected-dev-mode-mock-shallow-clone
+git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch main https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-dev-mode-mock-shallow-clone/mock-dep || (>&2 echo "ERROR: Failed to clone dependency 'https://github.com/asikros/make-bowerbird-deps.git'" && exit 1)
+test -n "$(WORKDIR_TEST)/test-dev-mode-mock-shallow-clone/mock-dep"
+test -d "$(WORKDIR_TEST)/test-dev-mode-mock-shallow-clone/mock-dep/.git"
+rm -rfv -- "$(WORKDIR_TEST)/test-dev-mode-mock-shallow-clone/mock-dep/.git"
+mkdir -p $(WORKDIR_TEST)/test-dev-mode-mock-shallow-clone/mock-dep/
+touch $(WORKDIR_TEST)/test-dev-mode-mock-shallow-clone/mock-dep/bowerbird.mk
+endef
 
-ifdef TEST_DEV_MODE_FULL_CLONE
-    $(call bowerbird::git-dependency, \
-        name=test-dev-mode-full, \
-        path=$(WORKDIR_TEST)/test-dev-mode-full-clone/deps/test-repo, \
-        url=https://github.com/ic-designer/make-bowerbird-deps.git, \
-        branch=main, \
-        entry=bowerbird.mk)
+expected-dev-mode-mock-shallow-clone := $(__expected-dev-mode-mock-shallow-clone)
+
+
+test-dev-mode-mock-full-clone: $(WORKDIR_TEST)/test-dev-mode-mock-full-clone/mock-shell.bash
+	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
+	@mkdir -p $(WORKDIR_TEST)/$@
+	@cat /dev/null > $(WORKDIR_TEST)/$@/results
+	$(MAKE) -j1 BOWERBIRD_MOCK_RESULTS=$(WORKDIR_TEST)/$@/results \
+		TEST_DEV_MODE_MOCK_FULL_CLONE=true \
+		$(WORKDIR_TEST)/$@/mock-dep/. \
+		-- --bowerbird-dev-mode
+	$(call bowerbird::test::compare-file-content-from-var,$(WORKDIR_TEST)/$@/results,expected-dev-mode-mock-full-clone)
+
+ifdef TEST_DEV_MODE_MOCK_FULL_CLONE
+$(eval $(call bowerbird::git-dependency, \
+    name=mock-dep-full, \
+    path=$(WORKDIR_TEST)/test-dev-mode-mock-full-clone/mock-dep, \
+    url=https://github.com/asikros/make-bowerbird-deps.git, \
+    branch=main, \
+    entry=bowerbird.mk))
+
+$(WORKDIR_TEST)/test-dev-mode-mock-full-clone/mock-dep/bowerbird.mk: | $(WORKDIR_TEST)/test-dev-mode-mock-full-clone/mock-dep/.
+	@mkdir -p $(dir $@)
+	@touch $@
 endif
 
-.PHONY: FORCE
-FORCE:
-	@:
+define __expected-dev-mode-mock-full-clone
+git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --branch main https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-dev-mode-mock-full-clone/mock-dep || (>&2 echo "ERROR: Failed to clone dependency 'https://github.com/asikros/make-bowerbird-deps.git'" && exit 1)
+mkdir -p $(WORKDIR_TEST)/test-dev-mode-mock-full-clone/mock-dep/
+touch $(WORKDIR_TEST)/test-dev-mode-mock-full-clone/mock-dep/bowerbird.mk
+endef
+
+expected-dev-mode-mock-full-clone := $(__expected-dev-mode-mock-full-clone)

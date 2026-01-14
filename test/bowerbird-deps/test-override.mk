@@ -1,309 +1,282 @@
-# Test for command-line override functionality
+# Mock tests for command-line override functionality
 #
-#	This file contains tests to verify command-line override behavior for git dependencies.
-#	Tests cover branch, revision, url, path, and entry overrides.
-#
+# These tests verify that bowerbird::git-dependency generates correct
+# git clone commands with various overrides, using the mock shell.
 
-# test-override-branch
-#
-#	Tests command-line override of branch parameter.
-#	Verifies that <name>.branch=<value> overrides the default branch.
-#
-#	Raises:
-#		ERROR: If override is not applied or clone fails.
-#
-test-override-branch:
-	@echo "Running test-override-branch"
-	test ! -d $(WORKDIR_TEST)/$@/deps/test-repo || rm -rf $(WORKDIR_TEST)/$@/deps/test-repo
-	test ! -d $(WORKDIR_TEST)/$@/deps/test-repo
-	$(MAKE) FORCE TEST_OVERRIDE_BRANCH=true test-repo.branch=v0.1.0
-	test -d $(WORKDIR_TEST)/$@/deps/test-repo
-	! test -d $(WORKDIR_TEST)/$@/deps/test-repo/.git
+test-override-mock-branch: $(WORKDIR_TEST)/test-override-mock-branch/mock-shell.bash
+	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
+	@mkdir -p $(WORKDIR_TEST)/$@
+	@cat /dev/null > $(WORKDIR_TEST)/$@/results
+	$(MAKE) -j1 BOWERBIRD_MOCK_RESULTS=$(WORKDIR_TEST)/$@/results \
+		TEST_OVERRIDE_MOCK_BRANCH=true \
+		test-repo.branch=0.1.0 \
+		$(WORKDIR_TEST)/$@/mock-dep/.
+	$(call bowerbird::test::compare-file-content-from-var,$(WORKDIR_TEST)/$@/results,expected-override-mock-branch)
 
-ifdef TEST_OVERRIDE_BRANCH
-    $(call bowerbird::git-dependency, \
-		name=test-repo, \
-		path=$(WORKDIR_TEST)/test-override-branch/deps/test-repo, \
-		url=https://github.com/ic-designer/make-bowerbird-deps.git, \
-		branch=main, \
-		entry=bowerbird.mk)
+ifdef TEST_OVERRIDE_MOCK_BRANCH
+$(eval $(call bowerbird::git-dependency, \
+    name=test-repo, \
+    path=$(WORKDIR_TEST)/test-override-mock-branch/mock-dep, \
+    url=https://github.com/asikros/make-bowerbird-deps.git, \
+    branch=main, \
+    entry=bowerbird.mk))
+
+$(WORKDIR_TEST)/test-override-mock-branch/mock-dep/bowerbird.mk: | $(WORKDIR_TEST)/test-override-mock-branch/mock-dep/.
+	@mkdir -p $(dir $@)
+	@touch $@
 endif
 
-# test-override-revision
-#
-#	Tests command-line override to use a specific revision instead of branch.
-#	Verifies that <name>.revision=<sha> overrides branch with specific commit.
-#
-#	Raises:
-#		ERROR: If override is not applied or clone fails.
-#
-test-override-revision:
-	@echo "Running test-override-revision"
-	test ! -d $(WORKDIR_TEST)/$@/deps/test-repo || rm -rf $(WORKDIR_TEST)/$@/deps/test-repo
-	test ! -d $(WORKDIR_TEST)/$@/deps/test-repo
-	$(MAKE) FORCE TEST_OVERRIDE_REVISION=true test-repo.revision=8e3c8a1
-	test -d $(WORKDIR_TEST)/$@/deps/test-repo
-	! test -d $(WORKDIR_TEST)/$@/deps/test-repo/.git
+define __expected-override-mock-branch
+git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch 0.1.0 https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-branch/mock-dep || (>&2 echo "ERROR: Failed to clone dependency 'https://github.com/asikros/make-bowerbird-deps.git'" && exit 1)
+test -n "$(WORKDIR_TEST)/test-override-mock-branch/mock-dep"
+test -d "$(WORKDIR_TEST)/test-override-mock-branch/mock-dep/.git"
+rm -rfv -- "$(WORKDIR_TEST)/test-override-mock-branch/mock-dep/.git"
+mkdir -p $(WORKDIR_TEST)/test-override-mock-branch/mock-dep/
+touch $(WORKDIR_TEST)/test-override-mock-branch/mock-dep/bowerbird.mk
+endef
 
-ifdef TEST_OVERRIDE_REVISION
-    $(call bowerbird::git-dependency, \
-		name=test-repo, \
-		path=$(WORKDIR_TEST)/test-override-revision/deps/test-repo, \
-		url=https://github.com/ic-designer/make-bowerbird-deps.git, \
-		branch=main, \
-		entry=bowerbird.mk)
+expected-override-mock-branch := $(__expected-override-mock-branch)
+
+
+test-override-mock-revision: $(WORKDIR_TEST)/test-override-mock-revision/mock-shell.bash
+	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
+	@mkdir -p $(WORKDIR_TEST)/$@
+	@cat /dev/null > $(WORKDIR_TEST)/$@/results
+	$(MAKE) -j1 BOWERBIRD_MOCK_RESULTS=$(WORKDIR_TEST)/$@/results \
+		TEST_OVERRIDE_MOCK_REVISION=true \
+		test-repo.revision=8e3c8a1 \
+		$(WORKDIR_TEST)/$@/mock-dep/.
+	$(call bowerbird::test::compare-file-content-from-var,$(WORKDIR_TEST)/$@/results,expected-override-mock-revision)
+
+ifdef TEST_OVERRIDE_MOCK_REVISION
+$(eval $(call bowerbird::git-dependency, \
+    name=test-repo, \
+    path=$(WORKDIR_TEST)/test-override-mock-revision/mock-dep, \
+    url=https://github.com/asikros/make-bowerbird-deps.git, \
+    branch=main, \
+    entry=bowerbird.mk))
+
+$(WORKDIR_TEST)/test-override-mock-revision/mock-dep/bowerbird.mk: | $(WORKDIR_TEST)/test-override-mock-revision/mock-dep/.
+	@mkdir -p $(dir $@)
+	@touch $@
 endif
 
-# test-override-url
-#
-#	Tests command-line override of repository URL.
-#	Verifies that <name>.url=<value> overrides the default repository URL.
-#
-#	Raises:
-#		ERROR: If override is not applied or clone fails.
-#
-test-override-url:
-	@echo "Running test-override-url"
-	test ! -d $(WORKDIR_TEST)/$@/deps/test-repo || rm -rf $(WORKDIR_TEST)/$@/deps/test-repo
-	test ! -d $(WORKDIR_TEST)/$@/deps/test-repo
-	$(MAKE) FORCE TEST_OVERRIDE_URL=true test-repo.url=https://github.com/ic-designer/make-bowerbird-help.git
-	test -d $(WORKDIR_TEST)/$@/deps/test-repo
-	! test -d $(WORKDIR_TEST)/$@/deps/test-repo/.git
+define __expected-override-mock-revision
+git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --revision 8e3c8a1 https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-revision/mock-dep || (>&2 echo "ERROR: Failed to clone dependency 'https://github.com/asikros/make-bowerbird-deps.git'" && exit 1)
+test -n "$(WORKDIR_TEST)/test-override-mock-revision/mock-dep"
+test -d "$(WORKDIR_TEST)/test-override-mock-revision/mock-dep/.git"
+rm -rfv -- "$(WORKDIR_TEST)/test-override-mock-revision/mock-dep/.git"
+mkdir -p $(WORKDIR_TEST)/test-override-mock-revision/mock-dep/
+touch $(WORKDIR_TEST)/test-override-mock-revision/mock-dep/bowerbird.mk
+endef
 
-ifdef TEST_OVERRIDE_URL
-    $(call bowerbird::git-dependency, \
-		name=test-repo, \
-		path=$(WORKDIR_TEST)/test-override-url/deps/test-repo, \
-		url=https://github.com/ic-designer/make-bowerbird-deps.git, \
-		branch=main, \
-		entry=bowerbird.mk)
+expected-override-mock-revision := $(__expected-override-mock-revision)
+
+
+test-override-mock-url: $(WORKDIR_TEST)/test-override-mock-url/mock-shell.bash
+	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
+	@mkdir -p $(WORKDIR_TEST)/$@
+	@cat /dev/null > $(WORKDIR_TEST)/$@/results
+	$(MAKE) -j1 BOWERBIRD_MOCK_RESULTS=$(WORKDIR_TEST)/$@/results \
+		TEST_OVERRIDE_MOCK_URL=true \
+		test-repo.url=https://github.com/asikros/make-bowerbird-help.git \
+		$(WORKDIR_TEST)/$@/mock-dep/.
+	$(call bowerbird::test::compare-file-content-from-var,$(WORKDIR_TEST)/$@/results,expected-override-mock-url)
+
+ifdef TEST_OVERRIDE_MOCK_URL
+$(eval $(call bowerbird::git-dependency, \
+    name=test-repo, \
+    path=$(WORKDIR_TEST)/test-override-mock-url/mock-dep, \
+    url=https://github.com/asikros/make-bowerbird-deps.git, \
+    branch=main, \
+    entry=bowerbird.mk))
+
+$(WORKDIR_TEST)/test-override-mock-url/mock-dep/bowerbird.mk: | $(WORKDIR_TEST)/test-override-mock-url/mock-dep/.
+	@mkdir -p $(dir $@)
+	@touch $@
 endif
 
-# test-override-path
-#
-#	Tests command-line override of installation path.
-#	Verifies that <name>.path=<value> overrides the default installation path.
-#
-#	Raises:
-#		ERROR: If override is not applied or clone fails.
-#
-test-override-path:
-	@echo "Running test-override-path"
-	test ! -d $(WORKDIR_TEST)/$@/deps/alt-path || rm -rf $(WORKDIR_TEST)/$@/deps/alt-path
-	test ! -d $(WORKDIR_TEST)/$@/deps/alt-path
-	$(MAKE) FORCE TEST_OVERRIDE_PATH=true test-repo.path=$(WORKDIR_TEST)/test-override-path/deps/alt-path
-	test -d $(WORKDIR_TEST)/$@/deps/alt-path
-	! test -d $(WORKDIR_TEST)/$@/deps/alt-path/.git
+define __expected-override-mock-url
+git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch main https://github.com/asikros/make-bowerbird-help.git $(WORKDIR_TEST)/test-override-mock-url/mock-dep || (>&2 echo "ERROR: Failed to clone dependency 'https://github.com/asikros/make-bowerbird-help.git'" && exit 1)
+test -n "$(WORKDIR_TEST)/test-override-mock-url/mock-dep"
+test -d "$(WORKDIR_TEST)/test-override-mock-url/mock-dep/.git"
+rm -rfv -- "$(WORKDIR_TEST)/test-override-mock-url/mock-dep/.git"
+mkdir -p $(WORKDIR_TEST)/test-override-mock-url/mock-dep/
+touch $(WORKDIR_TEST)/test-override-mock-url/mock-dep/bowerbird.mk
+endef
 
-ifdef TEST_OVERRIDE_PATH
-    $(call bowerbird::git-dependency, \
-		name=test-repo, \
-		path=$(WORKDIR_TEST)/test-override-path/deps/test-repo, \
-		url=https://github.com/ic-designer/make-bowerbird-deps.git, \
-		branch=main, \
-		entry=bowerbird.mk)
+expected-override-mock-url := $(__expected-override-mock-url)
+
+
+test-override-mock-path: $(WORKDIR_TEST)/test-override-mock-path/mock-shell.bash
+	test ! -d $(WORKDIR_TEST)/$@/alt-path || rm -rf $(WORKDIR_TEST)/$@/alt-path
+	@mkdir -p $(WORKDIR_TEST)/$@
+	@cat /dev/null > $(WORKDIR_TEST)/$@/results
+	$(MAKE) -j1 BOWERBIRD_MOCK_RESULTS=$(WORKDIR_TEST)/$@/results \
+		TEST_OVERRIDE_MOCK_PATH=true \
+		test-repo.path=$(WORKDIR_TEST)/test-override-mock-path/alt-path \
+		$(WORKDIR_TEST)/$@/alt-path/.
+	$(call bowerbird::test::compare-file-content-from-var,$(WORKDIR_TEST)/$@/results,expected-override-mock-path)
+
+ifdef TEST_OVERRIDE_MOCK_PATH
+$(eval $(call bowerbird::git-dependency, \
+    name=test-repo, \
+    path=$(WORKDIR_TEST)/test-override-mock-path/mock-dep, \
+    url=https://github.com/asikros/make-bowerbird-deps.git, \
+    branch=main, \
+    entry=bowerbird.mk))
+
+$(WORKDIR_TEST)/test-override-mock-path/alt-path/bowerbird.mk: | $(WORKDIR_TEST)/test-override-mock-path/alt-path/.
+	@mkdir -p $(dir $@)
+	@touch $@
 endif
 
-# test-override-entry
-#
-#	Tests command-line override of entry point file.
-#	Verifies that <name>.entry=<value> overrides the default entry point.
-#
-#	Raises:
-#		ERROR: If override is not applied or entry point not found.
-#
-test-override-entry:
-	@echo "Running test-override-entry"
-	test ! -d $(WORKDIR_TEST)/$@/deps/test-repo || rm -rf $(WORKDIR_TEST)/$@/deps/test-repo
-	test ! -d $(WORKDIR_TEST)/$@/deps/test-repo
-	$(MAKE) FORCE TEST_OVERRIDE_ENTRY=true test-repo.entry=README.md
-	test -d $(WORKDIR_TEST)/$@/deps/test-repo
-	test -f $(WORKDIR_TEST)/$@/deps/test-repo/README.md
+define __expected-override-mock-path
+git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch main https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-path/alt-path || (>&2 echo "ERROR: Failed to clone dependency 'https://github.com/asikros/make-bowerbird-deps.git'" && exit 1)
+test -n "$(WORKDIR_TEST)/test-override-mock-path/alt-path"
+test -d "$(WORKDIR_TEST)/test-override-mock-path/alt-path/.git"
+rm -rfv -- "$(WORKDIR_TEST)/test-override-mock-path/alt-path/.git"
+mkdir -p $(WORKDIR_TEST)/test-override-mock-path/alt-path/
+touch $(WORKDIR_TEST)/test-override-mock-path/alt-path/bowerbird.mk
+endef
 
-ifdef TEST_OVERRIDE_ENTRY
-    $(call bowerbird::git-dependency, \
-		name=test-repo, \
-		path=$(WORKDIR_TEST)/test-override-entry/deps/test-repo, \
-		url=https://github.com/ic-designer/make-bowerbird-deps.git, \
-		branch=main, \
-		entry=bowerbird.mk)
+expected-override-mock-path := $(__expected-override-mock-path)
+
+
+test-override-mock-entry: $(WORKDIR_TEST)/test-override-mock-entry/mock-shell.bash
+	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
+	@mkdir -p $(WORKDIR_TEST)/$@
+	@cat /dev/null > $(WORKDIR_TEST)/$@/results
+	$(MAKE) -j1 BOWERBIRD_MOCK_RESULTS=$(WORKDIR_TEST)/$@/results \
+		TEST_OVERRIDE_MOCK_ENTRY=true \
+		test-repo.entry=Makefile \
+		$(WORKDIR_TEST)/$@/mock-dep/.
+	$(call bowerbird::test::compare-file-content-from-var,$(WORKDIR_TEST)/$@/results,expected-override-mock-entry)
+
+ifdef TEST_OVERRIDE_MOCK_ENTRY
+$(eval $(call bowerbird::git-dependency, \
+    name=test-repo, \
+    path=$(WORKDIR_TEST)/test-override-mock-entry/mock-dep, \
+    url=https://github.com/asikros/make-bowerbird-deps.git, \
+    branch=main, \
+    entry=bowerbird.mk))
+
+$(WORKDIR_TEST)/test-override-mock-entry/mock-dep/Makefile: | $(WORKDIR_TEST)/test-override-mock-entry/mock-dep/.
+	@mkdir -p $(dir $@)
+	@touch $@
 endif
 
-# test-override-multiple
-#
-#	Tests multiple simultaneous overrides.
-#	Verifies that multiple parameters can be overridden at once.
-#
-#	Raises:
-#		ERROR: If any override is not applied.
-#
-test-override-multiple:
-	@echo "Running test-override-multiple"
-	test ! -d $(WORKDIR_TEST)/$@/deps/alt-path || rm -rf $(WORKDIR_TEST)/$@/deps/alt-path
-	test ! -d $(WORKDIR_TEST)/$@/deps/alt-path
-	$(MAKE) FORCE TEST_OVERRIDE_MULTIPLE=true \
-		test-repo.path=$(WORKDIR_TEST)/test-override-multiple/deps/alt-path \
-		test-repo.branch=v0.1.0 \
-		test-repo.entry=README.md
-	test -d $(WORKDIR_TEST)/$@/deps/alt-path
-	test -f $(WORKDIR_TEST)/$@/deps/alt-path/README.md
+define __expected-override-mock-entry
+git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch main https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-entry/mock-dep || (>&2 echo "ERROR: Failed to clone dependency 'https://github.com/asikros/make-bowerbird-deps.git'" && exit 1)
+test -n "$(WORKDIR_TEST)/test-override-mock-entry/mock-dep"
+test -d "$(WORKDIR_TEST)/test-override-mock-entry/mock-dep/.git"
+rm -rfv -- "$(WORKDIR_TEST)/test-override-mock-entry/mock-dep/.git"
+mkdir -p $(WORKDIR_TEST)/test-override-mock-entry/mock-dep/
+touch $(WORKDIR_TEST)/test-override-mock-entry/mock-dep/Makefile
+endef
 
-ifdef TEST_OVERRIDE_MULTIPLE
-    $(call bowerbird::git-dependency, \
-		name=test-repo, \
-		path=$(WORKDIR_TEST)/test-override-multiple/deps/test-repo, \
-		url=https://github.com/ic-designer/make-bowerbird-deps.git, \
-		branch=main, \
-		entry=bowerbird.mk)
+expected-override-mock-entry := $(__expected-override-mock-entry)
+
+
+test-override-mock-multiple: $(WORKDIR_TEST)/test-override-mock-multiple/mock-shell.bash
+	test ! -d $(WORKDIR_TEST)/$@/alt-path || rm -rf $(WORKDIR_TEST)/$@/alt-path
+	@mkdir -p $(WORKDIR_TEST)/$@
+	@cat /dev/null > $(WORKDIR_TEST)/$@/results
+	$(MAKE) -j1 BOWERBIRD_MOCK_RESULTS=$(WORKDIR_TEST)/$@/results \
+		TEST_OVERRIDE_MOCK_MULTIPLE=true \
+		test-repo.path=$(WORKDIR_TEST)/test-override-mock-multiple/alt-path \
+		test-repo.branch=0.1.0 \
+		test-repo.entry=README.md \
+		$(WORKDIR_TEST)/$@/alt-path/.
+	$(call bowerbird::test::compare-file-content-from-var,$(WORKDIR_TEST)/$@/results,expected-override-mock-multiple)
+
+ifdef TEST_OVERRIDE_MOCK_MULTIPLE
+$(eval $(call bowerbird::git-dependency, \
+    name=test-repo, \
+    path=$(WORKDIR_TEST)/test-override-mock-multiple/mock-dep, \
+    url=https://github.com/asikros/make-bowerbird-deps.git, \
+    branch=main, \
+    entry=bowerbird.mk))
+
+$(WORKDIR_TEST)/test-override-mock-multiple/alt-path/README.md: | $(WORKDIR_TEST)/test-override-mock-multiple/alt-path/.
+	@mkdir -p $(dir $@)
+	@touch $@
 endif
 
-# test-override-branch-with-dev-mode
-#
-#	Tests branch override combined with --bowerbird-dev-mode flag.
-#	Verifies override works in development mode with full clone.
-#
-#	Raises:
-#		ERROR: If override is not applied or .git not preserved.
-#
-test-override-branch-with-dev-mode:
-	@echo "Running test-override-branch-with-dev-mode"
-	test ! -d $(WORKDIR_TEST)/$@/deps/test-repo || rm -rf $(WORKDIR_TEST)/$@/deps/test-repo
-	test ! -d $(WORKDIR_TEST)/$@/deps/test-repo
-	$(MAKE) FORCE TEST_OVERRIDE_BRANCH_DEV=true test-repo.branch=v0.1.0 -- --bowerbird-dev-mode
-	test -d $(WORKDIR_TEST)/$@/deps/test-repo
-	test -d $(WORKDIR_TEST)/$@/deps/test-repo/.git
+define __expected-override-mock-multiple
+git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch 0.1.0 https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-multiple/alt-path || (>&2 echo "ERROR: Failed to clone dependency 'https://github.com/asikros/make-bowerbird-deps.git'" && exit 1)
+test -n "$(WORKDIR_TEST)/test-override-mock-multiple/alt-path"
+test -d "$(WORKDIR_TEST)/test-override-mock-multiple/alt-path/.git"
+rm -rfv -- "$(WORKDIR_TEST)/test-override-mock-multiple/alt-path/.git"
+mkdir -p $(WORKDIR_TEST)/test-override-mock-multiple/alt-path/
+touch $(WORKDIR_TEST)/test-override-mock-multiple/alt-path/README.md
+endef
 
-ifdef TEST_OVERRIDE_BRANCH_DEV
-    $(call bowerbird::git-dependency, \
-		name=test-repo, \
-		path=$(WORKDIR_TEST)/test-override-branch-with-dev-mode/deps/test-repo, \
-		url=https://github.com/ic-designer/make-bowerbird-deps.git, \
-		branch=main, \
-		entry=bowerbird.mk)
+expected-override-mock-multiple := $(__expected-override-mock-multiple)
+
+
+test-override-mock-branch-with-dev-mode: $(WORKDIR_TEST)/test-override-mock-branch-with-dev-mode/mock-shell.bash
+	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
+	@mkdir -p $(WORKDIR_TEST)/$@
+	@cat /dev/null > $(WORKDIR_TEST)/$@/results
+	$(MAKE) -j1 BOWERBIRD_MOCK_RESULTS=$(WORKDIR_TEST)/$@/results \
+		TEST_OVERRIDE_MOCK_BRANCH_DEV=true \
+		test-repo.branch=0.1.0 \
+		$(WORKDIR_TEST)/$@/mock-dep/. \
+		-- --bowerbird-dev-mode
+	$(call bowerbird::test::compare-file-content-from-var,$(WORKDIR_TEST)/$@/results,expected-override-mock-branch-with-dev-mode)
+
+ifdef TEST_OVERRIDE_MOCK_BRANCH_DEV
+$(eval $(call bowerbird::git-dependency, \
+    name=test-repo, \
+    path=$(WORKDIR_TEST)/test-override-mock-branch-with-dev-mode/mock-dep, \
+    url=https://github.com/asikros/make-bowerbird-deps.git, \
+    branch=main, \
+    entry=bowerbird.mk))
+
+$(WORKDIR_TEST)/test-override-mock-branch-with-dev-mode/mock-dep/bowerbird.mk: | $(WORKDIR_TEST)/test-override-mock-branch-with-dev-mode/mock-dep/.
+	@mkdir -p $(dir $@)
+	@touch $@
 endif
 
-# test-override-no-override
-#
-#	Tests that defaults are used when no override is provided.
-#	Verifies normal behavior without any command-line overrides.
-#
-#	Raises:
-#		ERROR: If clone fails with default parameters.
-#
-test-override-no-override:
-	@echo "Running test-override-no-override"
-	test ! -d $(WORKDIR_TEST)/$@/deps/test-repo || rm -rf $(WORKDIR_TEST)/$@/deps/test-repo
-	test ! -d $(WORKDIR_TEST)/$@/deps/test-repo
-	$(MAKE) FORCE TEST_OVERRIDE_NONE=true
-	test -d $(WORKDIR_TEST)/$@/deps/test-repo
-	! test -d $(WORKDIR_TEST)/$@/deps/test-repo/.git
+define __expected-override-mock-branch-with-dev-mode
+git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --branch 0.1.0 https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-branch-with-dev-mode/mock-dep || (>&2 echo "ERROR: Failed to clone dependency 'https://github.com/asikros/make-bowerbird-deps.git'" && exit 1)
+mkdir -p $(WORKDIR_TEST)/test-override-mock-branch-with-dev-mode/mock-dep/
+touch $(WORKDIR_TEST)/test-override-mock-branch-with-dev-mode/mock-dep/bowerbird.mk
+endef
 
-ifdef TEST_OVERRIDE_NONE
-    $(call bowerbird::git-dependency, \
-		name=test-repo, \
-		path=$(WORKDIR_TEST)/test-override-no-override/deps/test-repo, \
-		url=https://github.com/ic-designer/make-bowerbird-deps.git, \
-		branch=main, \
-		entry=bowerbird.mk)
+expected-override-mock-branch-with-dev-mode := $(__expected-override-mock-branch-with-dev-mode)
+
+
+test-override-mock-no-override: $(WORKDIR_TEST)/test-override-mock-no-override/mock-shell.bash
+	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
+	@mkdir -p $(WORKDIR_TEST)/$@
+	@cat /dev/null > $(WORKDIR_TEST)/$@/results
+	$(MAKE) -j1 BOWERBIRD_MOCK_RESULTS=$(WORKDIR_TEST)/$@/results \
+		TEST_OVERRIDE_MOCK_NONE=true \
+		$(WORKDIR_TEST)/$@/mock-dep/.
+	$(call bowerbird::test::compare-file-content-from-var,$(WORKDIR_TEST)/$@/results,expected-override-mock-no-override)
+
+ifdef TEST_OVERRIDE_MOCK_NONE
+$(eval $(call bowerbird::git-dependency, \
+    name=test-repo, \
+    path=$(WORKDIR_TEST)/test-override-mock-no-override/mock-dep, \
+    url=https://github.com/asikros/make-bowerbird-deps.git, \
+    branch=main, \
+    entry=bowerbird.mk))
+
+$(WORKDIR_TEST)/test-override-mock-no-override/mock-dep/bowerbird.mk: | $(WORKDIR_TEST)/test-override-mock-no-override/mock-dep/.
+	@mkdir -p $(dir $@)
+	@touch $@
 endif
 
-# test-override-invalid-branch
-#
-#	Tests error handling when invalid branch is provided via override.
-#	Verifies that git clone fails gracefully with clear error message.
-#
-#	Raises:
-#		ERROR: Failed to clone dependency (expected).
-#
-test-override-invalid-branch:
-	@echo "Running test-override-invalid-branch"
-	! $(MAKE) FORCE TEST_OVERRIDE_BAD_BRANCH=true test-repo.branch=nonexistent-branch-xyz
-	! test -d $(WORKDIR_TEST)/$@/deps/test-repo
+define __expected-override-mock-no-override
+git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch main https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-no-override/mock-dep || (>&2 echo "ERROR: Failed to clone dependency 'https://github.com/asikros/make-bowerbird-deps.git'" && exit 1)
+test -n "$(WORKDIR_TEST)/test-override-mock-no-override/mock-dep"
+test -d "$(WORKDIR_TEST)/test-override-mock-no-override/mock-dep/.git"
+rm -rfv -- "$(WORKDIR_TEST)/test-override-mock-no-override/mock-dep/.git"
+mkdir -p $(WORKDIR_TEST)/test-override-mock-no-override/mock-dep/
+touch $(WORKDIR_TEST)/test-override-mock-no-override/mock-dep/bowerbird.mk
+endef
 
-ifdef TEST_OVERRIDE_BAD_BRANCH
-    $(call bowerbird::git-dependency, \
-		name=test-repo, \
-		path=$(WORKDIR_TEST)/test-override-invalid-branch/deps/test-repo, \
-		url=https://github.com/ic-designer/make-bowerbird-deps.git, \
-		branch=main, \
-		entry=bowerbird.mk)
-endif
-
-# test-override-invalid-url
-#
-#	Tests error handling when invalid URL is provided via override.
-#	Verifies that git clone fails gracefully with clear error message.
-#
-#	Raises:
-#		ERROR: Failed to clone dependency (expected).
-#
-test-override-invalid-url:
-	@echo "Running test-override-invalid-url"
-	! $(MAKE) FORCE TEST_OVERRIDE_BAD_URL=true test-repo.url=https://invalid.url/nonexistent.git
-	! test -d $(WORKDIR_TEST)/$@/deps/test-repo
-
-ifdef TEST_OVERRIDE_BAD_URL
-    $(call bowerbird::git-dependency, \
-		name=test-repo, \
-		path=$(WORKDIR_TEST)/test-override-invalid-url/deps/test-repo, \
-		url=https://github.com/ic-designer/make-bowerbird-deps.git, \
-		branch=main, \
-		entry=bowerbird.mk)
-endif
-
-# test-override-invalid-entry
-#
-#	Tests error handling when invalid entry point is provided via override.
-#	Verifies that missing entry file causes proper error and cleanup.
-#
-#	Raises:
-#		ERROR: Expected entry point not found (expected).
-#
-test-override-invalid-entry:
-	@echo "Running test-override-invalid-entry"
-	! $(MAKE) FORCE TEST_OVERRIDE_BAD_ENTRY=true test-repo.entry=nonexistent.mk
-	! test -d $(WORKDIR_TEST)/$@/deps/test-repo
-
-ifdef TEST_OVERRIDE_BAD_ENTRY
-    $(call bowerbird::git-dependency, \
-		name=test-repo, \
-		path=$(WORKDIR_TEST)/test-override-invalid-entry/deps/test-repo, \
-		url=https://github.com/ic-designer/make-bowerbird-deps.git, \
-		branch=main, \
-		entry=bowerbird.mk)
-endif
-
-# test-override-mixed-repos
-#
-#	Tests that overrides apply to specific dependencies only.
-#	Verifies that one dependency's override doesn't affect another.
-#
-#	Raises:
-#		ERROR: If overrides are incorrectly applied.
-#
-test-override-mixed-repos:
-	@echo "Running test-override-mixed-repos"
-	test ! -d $(WORKDIR_TEST)/$@/deps/repo1 || rm -rf $(WORKDIR_TEST)/$@/deps/repo1
-	test ! -d $(WORKDIR_TEST)/$@/deps/repo2 || rm -rf $(WORKDIR_TEST)/$@/deps/repo2
-	$(MAKE) FORCE TEST_OVERRIDE_MIXED=true repo1.branch=v0.1.0
-	test -d $(WORKDIR_TEST)/$@/deps/repo1
-	test -d $(WORKDIR_TEST)/$@/deps/repo2
-
-ifdef TEST_OVERRIDE_MIXED
-    $(call bowerbird::git-dependency, \
-		name=repo1, \
-		path=$(WORKDIR_TEST)/test-override-mixed-repos/deps/repo1, \
-		url=https://github.com/ic-designer/make-bowerbird-deps.git, \
-		branch=main, \
-		entry=bowerbird.mk)
-    $(call bowerbird::git-dependency, \
-		name=repo2, \
-		path=$(WORKDIR_TEST)/test-override-mixed-repos/deps/repo2, \
-		url=https://github.com/ic-designer/make-bowerbird-help.git, \
-		branch=main, \
-		entry=bowerbird.mk)
-endif
-
-.PHONY: FORCE
-FORCE:
-	@:
+expected-override-mock-no-override := $(__expected-override-mock-no-override)

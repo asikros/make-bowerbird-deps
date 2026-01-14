@@ -3,7 +3,7 @@
 # These tests verify that bowerbird::git-dependency generates correct
 # git clone commands with various overrides, using the mock shell.
 
-test-override-mock-branch: $(WORKDIR_TEST)/test-override-mock-branch/mock-shell.bash
+test-override-mock-branch:
 	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
 	@mkdir -p $(WORKDIR_TEST)/$@
 	@cat /dev/null > $(WORKDIR_TEST)/$@/results
@@ -38,7 +38,7 @@ endef
 expected-override-mock-branch := $(__expected-override-mock-branch)
 
 
-test-override-mock-revision: $(WORKDIR_TEST)/test-override-mock-revision/mock-shell.bash
+test-override-mock-revision:
 	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
 	@mkdir -p $(WORKDIR_TEST)/$@
 	@cat /dev/null > $(WORKDIR_TEST)/$@/results
@@ -73,7 +73,7 @@ endef
 expected-override-mock-revision := $(__expected-override-mock-revision)
 
 
-test-override-mock-url: $(WORKDIR_TEST)/test-override-mock-url/mock-shell.bash
+test-override-mock-url:
 	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
 	@mkdir -p $(WORKDIR_TEST)/$@
 	@cat /dev/null > $(WORKDIR_TEST)/$@/results
@@ -108,7 +108,7 @@ endef
 expected-override-mock-url := $(__expected-override-mock-url)
 
 
-test-override-mock-path: $(WORKDIR_TEST)/test-override-mock-path/mock-shell.bash
+test-override-mock-path:
 	test ! -d $(WORKDIR_TEST)/$@/alt-path || rm -rf $(WORKDIR_TEST)/$@/alt-path
 	@mkdir -p $(WORKDIR_TEST)/$@
 	@cat /dev/null > $(WORKDIR_TEST)/$@/results
@@ -143,7 +143,7 @@ endef
 expected-override-mock-path := $(__expected-override-mock-path)
 
 
-test-override-mock-entry: $(WORKDIR_TEST)/test-override-mock-entry/mock-shell.bash
+test-override-mock-entry:
 	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
 	@mkdir -p $(WORKDIR_TEST)/$@
 	@cat /dev/null > $(WORKDIR_TEST)/$@/results
@@ -178,7 +178,7 @@ endef
 expected-override-mock-entry := $(__expected-override-mock-entry)
 
 
-test-override-mock-multiple: $(WORKDIR_TEST)/test-override-mock-multiple/mock-shell.bash
+test-override-mock-multiple:
 	test ! -d $(WORKDIR_TEST)/$@/alt-path || rm -rf $(WORKDIR_TEST)/$@/alt-path
 	@mkdir -p $(WORKDIR_TEST)/$@
 	@cat /dev/null > $(WORKDIR_TEST)/$@/results
@@ -215,7 +215,7 @@ endef
 expected-override-mock-multiple := $(__expected-override-mock-multiple)
 
 
-test-override-mock-branch-with-dev-mode: $(WORKDIR_TEST)/test-override-mock-branch-with-dev-mode/mock-shell.bash
+test-override-mock-branch-with-dev-mode:
 	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
 	@mkdir -p $(WORKDIR_TEST)/$@
 	@cat /dev/null > $(WORKDIR_TEST)/$@/results
@@ -248,7 +248,7 @@ endef
 expected-override-mock-branch-with-dev-mode := $(__expected-override-mock-branch-with-dev-mode)
 
 
-test-override-mock-no-override: $(WORKDIR_TEST)/test-override-mock-no-override/mock-shell.bash
+test-override-mock-no-override:
 	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
 	@mkdir -p $(WORKDIR_TEST)/$@
 	@cat /dev/null > $(WORKDIR_TEST)/$@/results

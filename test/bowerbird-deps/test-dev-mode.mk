@@ -26,7 +26,7 @@ $(WORKDIR_TEST)/test-dev-mode-mock-shallow-clone/mock-dep/bowerbird.mk: | $(WORK
 endif
 
 define __expected-dev-mode-mock-shallow-clone
-git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch main https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-dev-mode-mock-shallow-clone/mock-dep || (>&2 echo "ERROR: Failed to clone dependency 'https://github.com/asikros/make-bowerbird-deps.git'" && exit 1)
+git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch main https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-dev-mode-mock-shallow-clone/mock-dep || (>&2 echo "ERROR: Failed to clone dependency '\''https://github.com/asikros/make-bowerbird-deps.git'\''" && exit 1)
 test -n "$(WORKDIR_TEST)/test-dev-mode-mock-shallow-clone/mock-dep"
 test -d "$(WORKDIR_TEST)/test-dev-mode-mock-shallow-clone/mock-dep/.git"
 rm -rfv -- "$(WORKDIR_TEST)/test-dev-mode-mock-shallow-clone/mock-dep/.git"
@@ -61,9 +61,13 @@ $(WORKDIR_TEST)/test-dev-mode-mock-full-clone/mock-dep/bowerbird.mk: | $(WORKDIR
 endif
 
 define __expected-dev-mode-mock-full-clone
-git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --branch main https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-dev-mode-mock-full-clone/mock-dep || (>&2 echo "ERROR: Failed to clone dependency 'https://github.com/asikros/make-bowerbird-deps.git'" && exit 1)
+echo "INFO: Cloning dependency in DEV mode: https://github.com/asikros/make-bowerbird-deps.git"
+git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --branch main https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-dev-mode-mock-full-clone/mock-dep || (>&2 echo "ERROR: Failed to clone dependency '\''https://github.com/asikros/make-bowerbird-deps.git'\''" && exit 1)
+test -n "$(WORKDIR_TEST)/test-dev-mode-mock-full-clone/mock-dep"
+test -d "$(WORKDIR_TEST)/test-dev-mode-mock-full-clone/mock-dep/.git"
 mkdir -p $(WORKDIR_TEST)/test-dev-mode-mock-full-clone/mock-dep/
 touch $(WORKDIR_TEST)/test-dev-mode-mock-full-clone/mock-dep/bowerbird.mk
+:
 endef
 
 expected-dev-mode-mock-full-clone := $(__expected-dev-mode-mock-full-clone)

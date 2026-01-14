@@ -27,7 +27,7 @@ $(WORKDIR_TEST)/test-override-mock-branch/mock-dep/bowerbird.mk: | $(WORKDIR_TES
 endif
 
 define __expected-override-mock-branch
-git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch 0.1.0 https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-branch/mock-dep || (>&2 echo "ERROR: Failed to clone dependency 'https://github.com/asikros/make-bowerbird-deps.git'" && exit 1)
+git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch 0.1.0 https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-branch/mock-dep || (>&2 echo "ERROR: Failed to clone dependency '\''https://github.com/asikros/make-bowerbird-deps.git'\''" && exit 1)
 test -n "$(WORKDIR_TEST)/test-override-mock-branch/mock-dep"
 test -d "$(WORKDIR_TEST)/test-override-mock-branch/mock-dep/.git"
 rm -rfv -- "$(WORKDIR_TEST)/test-override-mock-branch/mock-dep/.git"
@@ -62,7 +62,7 @@ $(WORKDIR_TEST)/test-override-mock-revision/mock-dep/bowerbird.mk: | $(WORKDIR_T
 endif
 
 define __expected-override-mock-revision
-git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --revision 8e3c8a1 https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-revision/mock-dep || (>&2 echo "ERROR: Failed to clone dependency 'https://github.com/asikros/make-bowerbird-deps.git'" && exit 1)
+git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --revision 8e3c8a1 https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-revision/mock-dep || (>&2 echo "ERROR: Failed to clone dependency '\''https://github.com/asikros/make-bowerbird-deps.git'\''" && exit 1)
 test -n "$(WORKDIR_TEST)/test-override-mock-revision/mock-dep"
 test -d "$(WORKDIR_TEST)/test-override-mock-revision/mock-dep/.git"
 rm -rfv -- "$(WORKDIR_TEST)/test-override-mock-revision/mock-dep/.git"
@@ -97,7 +97,7 @@ $(WORKDIR_TEST)/test-override-mock-url/mock-dep/bowerbird.mk: | $(WORKDIR_TEST)/
 endif
 
 define __expected-override-mock-url
-git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch main https://github.com/asikros/make-bowerbird-help.git $(WORKDIR_TEST)/test-override-mock-url/mock-dep || (>&2 echo "ERROR: Failed to clone dependency 'https://github.com/asikros/make-bowerbird-help.git'" && exit 1)
+git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch main https://github.com/asikros/make-bowerbird-help.git $(WORKDIR_TEST)/test-override-mock-url/mock-dep || (>&2 echo "ERROR: Failed to clone dependency '\''https://github.com/asikros/make-bowerbird-help.git'\''" && exit 1)
 test -n "$(WORKDIR_TEST)/test-override-mock-url/mock-dep"
 test -d "$(WORKDIR_TEST)/test-override-mock-url/mock-dep/.git"
 rm -rfv -- "$(WORKDIR_TEST)/test-override-mock-url/mock-dep/.git"
@@ -132,7 +132,7 @@ $(WORKDIR_TEST)/test-override-mock-path/alt-path/bowerbird.mk: | $(WORKDIR_TEST)
 endif
 
 define __expected-override-mock-path
-git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch main https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-path/alt-path || (>&2 echo "ERROR: Failed to clone dependency 'https://github.com/asikros/make-bowerbird-deps.git'" && exit 1)
+git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch main https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-path/alt-path || (>&2 echo "ERROR: Failed to clone dependency '\''https://github.com/asikros/make-bowerbird-deps.git'\''" && exit 1)
 test -n "$(WORKDIR_TEST)/test-override-mock-path/alt-path"
 test -d "$(WORKDIR_TEST)/test-override-mock-path/alt-path/.git"
 rm -rfv -- "$(WORKDIR_TEST)/test-override-mock-path/alt-path/.git"
@@ -167,7 +167,7 @@ $(WORKDIR_TEST)/test-override-mock-entry/mock-dep/Makefile: | $(WORKDIR_TEST)/te
 endif
 
 define __expected-override-mock-entry
-git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch main https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-entry/mock-dep || (>&2 echo "ERROR: Failed to clone dependency 'https://github.com/asikros/make-bowerbird-deps.git'" && exit 1)
+git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch main https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-entry/mock-dep || (>&2 echo "ERROR: Failed to clone dependency '\''https://github.com/asikros/make-bowerbird-deps.git'\''" && exit 1)
 test -n "$(WORKDIR_TEST)/test-override-mock-entry/mock-dep"
 test -d "$(WORKDIR_TEST)/test-override-mock-entry/mock-dep/.git"
 rm -rfv -- "$(WORKDIR_TEST)/test-override-mock-entry/mock-dep/.git"
@@ -204,7 +204,7 @@ $(WORKDIR_TEST)/test-override-mock-multiple/alt-path/README.md: | $(WORKDIR_TEST
 endif
 
 define __expected-override-mock-multiple
-git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch 0.1.0 https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-multiple/alt-path || (>&2 echo "ERROR: Failed to clone dependency 'https://github.com/asikros/make-bowerbird-deps.git'" && exit 1)
+git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch 0.1.0 https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-multiple/alt-path || (>&2 echo "ERROR: Failed to clone dependency '\''https://github.com/asikros/make-bowerbird-deps.git'\''" && exit 1)
 test -n "$(WORKDIR_TEST)/test-override-mock-multiple/alt-path"
 test -d "$(WORKDIR_TEST)/test-override-mock-multiple/alt-path/.git"
 rm -rfv -- "$(WORKDIR_TEST)/test-override-mock-multiple/alt-path/.git"
@@ -240,7 +240,7 @@ $(WORKDIR_TEST)/test-override-mock-branch-with-dev-mode/mock-dep/bowerbird.mk: |
 endif
 
 define __expected-override-mock-branch-with-dev-mode
-git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --branch 0.1.0 https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-branch-with-dev-mode/mock-dep || (>&2 echo "ERROR: Failed to clone dependency 'https://github.com/asikros/make-bowerbird-deps.git'" && exit 1)
+git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --branch 0.1.0 https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-branch-with-dev-mode/mock-dep || (>&2 echo "ERROR: Failed to clone dependency '\''https://github.com/asikros/make-bowerbird-deps.git'\''" && exit 1)
 mkdir -p $(WORKDIR_TEST)/test-override-mock-branch-with-dev-mode/mock-dep/
 touch $(WORKDIR_TEST)/test-override-mock-branch-with-dev-mode/mock-dep/bowerbird.mk
 endef
@@ -271,7 +271,7 @@ $(WORKDIR_TEST)/test-override-mock-no-override/mock-dep/bowerbird.mk: | $(WORKDI
 endif
 
 define __expected-override-mock-no-override
-git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch main https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-no-override/mock-dep || (>&2 echo "ERROR: Failed to clone dependency 'https://github.com/asikros/make-bowerbird-deps.git'" && exit 1)
+git clone --config advice.detachedHead=false --config http.lowSpeedLimit=1000 --config http.lowSpeedTime=60 --depth 1 --branch main https://github.com/asikros/make-bowerbird-deps.git $(WORKDIR_TEST)/test-override-mock-no-override/mock-dep || (>&2 echo "ERROR: Failed to clone dependency '\''https://github.com/asikros/make-bowerbird-deps.git'\''" && exit 1)
 test -n "$(WORKDIR_TEST)/test-override-mock-no-override/mock-dep"
 test -d "$(WORKDIR_TEST)/test-override-mock-no-override/mock-dep/.git"
 rm -rfv -- "$(WORKDIR_TEST)/test-override-mock-no-override/mock-dep/.git"

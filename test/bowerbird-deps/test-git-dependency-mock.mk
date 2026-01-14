@@ -3,7 +3,7 @@
 # These tests verify that bowerbird::git-dependency generates correct
 # git clone commands without actually executing them, using the mock shell.
 
-test-git-dependency-mock-branch: $(WORKDIR_TEST)/test-git-dependency-mock-branch/mock-shell.bash
+test-git-dependency-mock-branch:
 	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
 	@mkdir -p $(WORKDIR_TEST)/$@
 	@cat /dev/null > $(WORKDIR_TEST)/$@/results
@@ -38,7 +38,7 @@ endef
 expected-git-dependency-mock-branch := $(__expected-git-dependency-mock-branch)
 
 
-test-git-dependency-mock-revision: $(WORKDIR_TEST)/test-git-dependency-mock-revision/mock-shell.bash
+test-git-dependency-mock-revision:
 	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
 	@mkdir -p $(WORKDIR_TEST)/$@
 	@cat /dev/null > $(WORKDIR_TEST)/$@/results
@@ -73,7 +73,7 @@ endef
 expected-git-dependency-mock-revision := $(__expected-git-dependency-mock-revision)
 
 
-test-git-dependency-mock-dev-mode: $(WORKDIR_TEST)/test-git-dependency-mock-dev-mode/mock-shell.bash
+test-git-dependency-mock-dev-mode:
 	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
 	@mkdir -p $(WORKDIR_TEST)/$@
 	@cat /dev/null > $(WORKDIR_TEST)/$@/results
@@ -109,7 +109,7 @@ endef
 expected-git-dependency-mock-dev-mode := $(__expected-git-dependency-mock-dev-mode)
 
 
-test-git-dependency-mock-override-branch: $(WORKDIR_TEST)/test-git-dependency-mock-override-branch/mock-shell.bash
+test-git-dependency-mock-override-branch:
 	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
 	@mkdir -p $(WORKDIR_TEST)/$@
 	@cat /dev/null > $(WORKDIR_TEST)/$@/results
@@ -145,7 +145,7 @@ endef
 expected-git-dependency-mock-override-branch := $(__expected-git-dependency-mock-override-branch)
 
 
-test-git-dependency-mock-override-path: $(WORKDIR_TEST)/test-git-dependency-mock-override-path/mock-shell.bash
+test-git-dependency-mock-override-path:
 	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
 	@mkdir -p $(WORKDIR_TEST)/$@
 	@cat /dev/null > $(WORKDIR_TEST)/$@/results
@@ -181,7 +181,7 @@ endef
 expected-git-dependency-mock-override-path := $(__expected-git-dependency-mock-override-path)
 
 
-test-git-dependency-mock-override-url: $(WORKDIR_TEST)/test-git-dependency-mock-override-url/mock-shell.bash
+test-git-dependency-mock-override-url:
 	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
 	@mkdir -p $(WORKDIR_TEST)/$@
 	@cat /dev/null > $(WORKDIR_TEST)/$@/results
@@ -217,7 +217,7 @@ endef
 expected-git-dependency-mock-override-url := $(__expected-git-dependency-mock-override-url)
 
 
-test-git-dependency-mock-override-revision: $(WORKDIR_TEST)/test-git-dependency-mock-override-revision/mock-shell.bash
+test-git-dependency-mock-override-revision:
 	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
 	@mkdir -p $(WORKDIR_TEST)/$@
 	@cat /dev/null > $(WORKDIR_TEST)/$@/results
@@ -253,7 +253,7 @@ endef
 expected-git-dependency-mock-override-revision := $(__expected-git-dependency-mock-override-revision)
 
 
-test-git-dependency-mock-override-entry: $(WORKDIR_TEST)/test-git-dependency-mock-override-entry/mock-shell.bash
+test-git-dependency-mock-override-entry:
 	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
 	@mkdir -p $(WORKDIR_TEST)/$@
 	@cat /dev/null > $(WORKDIR_TEST)/$@/results

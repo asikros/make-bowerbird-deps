@@ -3,7 +3,7 @@
 # These tests verify that bowerbird::git-dependency generates correct
 # git clone commands with and without dev mode, using the mock shell.
 
-test-dev-mode-mock-shallow-clone: $(WORKDIR_TEST)/test-dev-mode-mock-shallow-clone/mock-shell.bash
+test-dev-mode-mock-shallow-clone:
 	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
 	@mkdir -p $(WORKDIR_TEST)/$@
 	@cat /dev/null > $(WORKDIR_TEST)/$@/results
@@ -37,7 +37,7 @@ endef
 expected-dev-mode-mock-shallow-clone := $(__expected-dev-mode-mock-shallow-clone)
 
 
-test-dev-mode-mock-full-clone: $(WORKDIR_TEST)/test-dev-mode-mock-full-clone/mock-shell.bash
+test-dev-mode-mock-full-clone:
 	test ! -d $(WORKDIR_TEST)/$@/mock-dep || rm -rf $(WORKDIR_TEST)/$@/mock-dep
 	@mkdir -p $(WORKDIR_TEST)/$@
 	@cat /dev/null > $(WORKDIR_TEST)/$@/results

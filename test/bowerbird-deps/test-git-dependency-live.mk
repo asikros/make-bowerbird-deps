@@ -14,7 +14,7 @@ ifdef TEST_GIT_DEPENDENCY_BOWERBIRD_DEPS_SUCCESS
     $(call bowerbird::git-dependency, \
         name=test-bowerbird-deps-success, \
         path=$(WORKDIR_TEST)/test-git-dependency-bowerbird-deps-success/deps/bowerbird-deps, \
-        url=https://github.com/ic-designer/make-bowerbird-deps.git, \
+        url=https://github.com/asikros/make-bowerbird-deps.git, \
         branch=main, \
         entry=bowerbird.mk)
 endif
@@ -37,7 +37,7 @@ ifdef TEST_GIT_DEPENDENCY_BOWERBIRD_DEPS_BAD_ENTRY
     $(call bowerbird::git-dependency, \
         name=test-bowerbird-deps-bad-entry, \
         path=$(WORKDIR_TEST)/test-git-dependency-bowerbird-deps-bad-entry/deps/bowerbird-deps, \
-        url=https://github.com/ic-designer/make-bowerbird-deps.git, \
+        url=https://github.com/asikros/make-bowerbird-deps.git, \
         branch=main, \
         entry=)
 endif
@@ -59,7 +59,7 @@ ifdef TEST_GIT_DEPENDENCY_BOWERBIRD_DEPS_BAD_PATH
     $(call bowerbird::git-dependency, \
         name=test-bowerbird-deps-bad-path, \
         path=$(WORKDIR_TEST)/test-git-dependency-bowerbird-deps-bad-path/deps/bowerbird-deps, \
-        url=https://github.com/ic-designer/make-bowerbird-deps.git, \
+        url=https://github.com/asikros/make-bowerbird-deps.git, \
         branch=main, \
         entry=bowerbird.mk)
 endif
@@ -101,12 +101,7 @@ ifdef TEST_GIT_DEPENDENCY_BOWERBIRD_DEPS_BAD_VERSION
     $(call bowerbird::git-dependency, \
         name=test-bowerbird-deps-bad-version, \
         path=$(WORKDIR_TEST)/test-git-dependency-bowerbird-deps-bad-version/deps/bowerbird-deps, \
-        url=https://github.com/ic-designer/make-bowerbird-deps.git, \
+        url=https://github.com/asikros/make-bowerbird-deps.git, \
         branch=, \
         entry=bowerbird.mk)
 endif
-
-
-.PHONY: FORCE
-FORCE:
-	:

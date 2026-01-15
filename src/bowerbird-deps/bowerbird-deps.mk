@@ -32,60 +32,55 @@ else
     __BOWERBIRD_KEEP_GIT :=
 endif
 
-# Define comma and space variables (needed for substitution)
-, := ,
-empty :=
-space := $(empty) $(empty)
-
-# Keyword arguments limit (we support one less than this value)
-KEYWORD_ARGS_LIMIT := 11
-
-# Note on local kwargs implementation:
-#   We maintain a local kwargs parser instead of using bowerbird-libs because
-#   bowerbird-deps.mk must be self-contained to bootstrap the dependency system.
-#   This file is included before any dependencies (including bowerbird-libs) are loaded,
-#   and we use it to load those dependencies, creating a chicken-and-egg problem.
+# bowerbird::deps::git-dependency-low-level
 #
-#   The implementation here is intentionally minimal. For full-featured kwargs handling
-#   with helpers like kwargs-require and kwargs-default, see bowerbird-libs.
-
-# bowerbird::deps::parse-keyword-args
+#	LOW-LEVEL: Installs a git dependency using positional arguments.
+#	Bootstrap-safe - no external dependencies required.
 #
-#	Parses keyword arguments with flexible spacing.
+#	This is the low-level API used internally to bootstrap the dependency system.
+#	For user-facing code, prefer bowerbird::git-dependency (kwargs-based).
 #
 #	Args:
-#		$(...): Keyword arguments in format key=value (flexible spacing supported).
+#		$1: Dependency name (for override variables)
+#		$2: Installation path
+#		$3: Git repository URL
+#		$4: Branch or tag name (mutually exclusive with $5)
+#		$5: Specific commit SHA (mutually exclusive with $4)
+#		$6: Entry point file (relative path)
 #
-#	Returns:
-#		Sets __ARG_<key> variables for each parsed key=value pair.
-#		Errors if KEYWORD_ARGS_LIMIT arguments are reached.
+#	Note:
+#		Specify either $4 (branch) OR $5 (revision), not both.
+#		Use empty string for the unused parameter.
+#
+#	Command-Line Overrides:
+#		<name>.branch=<value>     Override branch/tag
+#		<name>.revision=<value>   Override to specific SHA
+#		<name>.url=<value>        Override repository URL
+#		<name>.path=<value>       Override installation path
+#		<name>.entry=<value>      Override entry point
 #
 #	Example:
-#		$(call bowerbird::deps::parse-keyword-args,name=foo,path=bar,url=baz)
-#		$(call bowerbird::deps::parse-keyword-args, name=foo, path=bar, url=baz)
+#		$(call bowerbird::deps::git-dependency-low-level,my-lib,/tmp/lib,https://example.com/lib.git,main,,lib.mk)
+#		$(call bowerbird::deps::git-dependency-low-level,my-lib,/tmp/lib,https://example.com/lib.git,,abc123,lib.mk)
 #
-__ARG_NUMS := $(filter-out $(KEYWORD_ARGS_LIMIT),$(shell seq 1 $(KEYWORD_ARGS_LIMIT)))
-define bowerbird::deps::parse-keyword-args
-# Dynamically build the argument list
-$(eval __ALL_ARGS := $(foreach n,$(__ARG_NUMS),$(if $($n),$(if $(filter 1,$n),$($n),$(,)$($n)))))
-# Replace commas with spaces
-$(eval __SPLIT_ARGS := $(subst $(,),$(space),$(__ALL_ARGS)))
-# Error if word at KEYWORD_ARGS_LIMIT position exists (too many args)
-$(if $(word $(KEYWORD_ARGS_LIMIT),$(__SPLIT_ARGS)),\
-    $(error ERROR: Keyword argument limit reached (KEYWORD_ARGS_LIMIT=$(KEYWORD_ARGS_LIMIT))))
-# Parse each key=value pair
-$(foreach arg,$(__SPLIT_ARGS),\
-    $(if $(findstring =,$(arg)),\
-        $(eval __CLEAN := $(strip $(arg)))\
-        $(eval __KV := $(subst =, ,$(__CLEAN)))\
-        $(eval __ARG_$(word 1,$(__KV)) := $(word 2,$(__KV)))\
-    )\
-)
+define bowerbird::deps::git-dependency-low-level
+$(eval \
+$(if $1,,$(error ERROR: Dependency name (arg 1) is required)) \
+$(if $2,,$(error ERROR: Installation path (arg 2) is required)) \
+$(if $3,,$(error ERROR: Repository URL (arg 3) is required)) \
+$(if $6,,$(error ERROR: Entry point (arg 6) is required)) \
+$(if $(and $4,$5),$(error ERROR: Cannot specify both branch (arg 4) and revision (arg 5))) \
+$(if $(or $4,$5),,$(error ERROR: Must specify either branch (arg 4) or revision (arg 5))) \
+$(call bowerbird::deps::__git_dependency_impl,$(or $($1.path),$2),$(or $($1.url),$3),$(or $($1.branch),$4),$(or $($1.revision),$5),$(or $($1.entry),$6)))
 endef
 
 # bowerbird::git-dependency
 #
-#	Installs a git dependency using keyword arguments.
+#	HIGH-LEVEL: Installs a git dependency using keyword arguments.
+#	Requires bowerbird-libs for kwargs parsing.
+#
+#	This is the user-facing API with friendly named parameters.
+#	Delegates to bowerbird::deps::git-dependency-low-level for the actual installation.
 #
 #	By default, performs a shallow clone and deletes the git history to prevent
 #	accidental changes. When --bowerbird-dev-mode flag is used, performs a full
@@ -127,19 +122,26 @@ endef
 #		make check bowerbird-help.branch=feature-xyz
 #
 define bowerbird::git-dependency
-$(eval $(call bowerbird::deps::parse-keyword-args,$1,$2,$3,$4,$5,$6,$7,$8,$9,$(10)) \
-    $(if $(__ARG_name),,$(error ERROR: 'name' parameter is required)) \
-    $(if $(__ARG_path),,$(error ERROR: 'path' parameter is required)) \
-    $(if $(__ARG_url),,$(error ERROR: 'url' parameter is required)) \
-    $(if $(__ARG_entry),,$(error ERROR: 'entry' parameter is required)) \
-    $(if $(and $(__ARG_branch),$(__ARG_revision)),$(error ERROR: Cannot specify both 'branch' and 'revision')) \
-    $(if $(or $(__ARG_branch),$(__ARG_revision)),,$(error ERROR: Must specify either 'branch' or 'revision')) \
-    $(call bowerbird::deps::git-dependency-implementation,$(or $($(__ARG_name).path),$(__ARG_path)),$(or $($(__ARG_name).url),$(__ARG_url)),$(or $($(__ARG_name).branch),$(__ARG_branch)),$(or $($(__ARG_name).revision),$(__ARG_revision)),$(or $($(__ARG_name).entry),$(__ARG_entry))))
+$(call bowerbird::lib::kwargs-parse,$1,$2,$3,$4,$5,$6,$7,$8,$9,$(10))
+$(call bowerbird::lib::kwargs-require,name,'name' parameter is required)
+$(call bowerbird::lib::kwargs-require,path,'path' parameter is required)
+$(call bowerbird::lib::kwargs-require,url,'url' parameter is required)
+$(call bowerbird::lib::kwargs-require,entry,'entry' parameter is required)
+$(if $(and $(call bowerbird::lib::kwargs,branch),$(call bowerbird::lib::kwargs,revision)),$(error ERROR: Cannot specify both 'branch' and 'revision'))
+$(if $(or $(call bowerbird::lib::kwargs,branch),$(call bowerbird::lib::kwargs,revision)),,$(error ERROR: Must specify either 'branch' or 'revision'))
+$(eval __dep_name := $(call bowerbird::lib::kwargs,name))
+$(eval $(__dep_name).path ?=)
+$(eval $(__dep_name).url ?=)
+$(eval $(__dep_name).branch ?=)
+$(eval $(__dep_name).revision ?=)
+$(eval $(__dep_name).entry ?=)
+$(call bowerbird::deps::__git_dependency_impl,$(or $($(__dep_name).path),$(call bowerbird::lib::kwargs,path)),$(or $($(__dep_name).url),$(call bowerbird::lib::kwargs,url)),$(or $($(__dep_name).branch),$(call bowerbird::lib::kwargs,branch)),$(or $($(__dep_name).revision),$(call bowerbird::lib::kwargs,revision)),$(or $($(__dep_name).entry),$(call bowerbird::lib::kwargs,entry)))
 endef
 
-# bowerbird::deps::git-dependency-implementation
+# bowerbird::deps::__git_dependency_impl
 #
-#	Implementation that clones a git dependency.
+#	Internal implementation that clones a git dependency.
+#	Do not call directly - use bowerbird::git-dependency instead.
 #
 #	Uses --branch flag if branch is specified, --revision flag if revision is specified.
 #	Parameters are already resolved with command-line overrides applied.
@@ -161,7 +163,7 @@ endef
 #		Errors if git clone fails or entry point is not found.
 #		Cleans up partially installed files on failure.
 #
-define bowerbird::deps::git-dependency-implementation
+define bowerbird::deps::__git_dependency_impl
     $1/.:
 		$$(if $(__BOWERBIRD_KEEP_GIT),@echo "INFO: Cloning dependency in DEV mode: $2")
 		@git clone --config advice.detachedHead=false \

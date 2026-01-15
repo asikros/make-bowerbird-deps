@@ -13,27 +13,6 @@ WORKDIR_DEPS ?= $(error ERROR: Undefined variable WORKDIR_DEPS)
 include src/bowerbird-deps/bowerbird-deps.mk
 
 # Bootstrap all dependencies using low-level positional API
-# Initialize override variables to avoid undefined variable warnings
-bowerbird-libs.path ?=
-bowerbird-libs.url ?=
-bowerbird-libs.branch ?=
-bowerbird-libs.revision ?=
-bowerbird-libs.entry ?=
-bowerbird-help.path ?=
-bowerbird-help.url ?=
-bowerbird-help.branch ?=
-bowerbird-help.revision ?=
-bowerbird-help.entry ?=
-bowerbird-githooks.path ?=
-bowerbird-githooks.url ?=
-bowerbird-githooks.branch ?=
-bowerbird-githooks.revision ?=
-bowerbird-githooks.entry ?=
-bowerbird-test.path ?=
-bowerbird-test.url ?=
-bowerbird-test.branch ?=
-bowerbird-test.revision ?=
-bowerbird-test.entry ?=
 $(call bowerbird::deps::git-dependency-low-level,bowerbird-libs,$(WORKDIR_DEPS)/bowerbird-libs,https://github.com/asikros/make-bowerbird-libs.git,main,,bowerbird.mk)
 $(call bowerbird::deps::git-dependency-low-level,bowerbird-help,$(WORKDIR_DEPS)/bowerbird-help,https://github.com/asikros/make-bowerbird-help.git,main,,bowerbird.mk)
 $(call bowerbird::deps::git-dependency-low-level,bowerbird-githooks,$(WORKDIR_DEPS)/bowerbird-githooks,https://github.com/asikros/make-bowerbird-githooks.git,main,,bowerbird.mk)

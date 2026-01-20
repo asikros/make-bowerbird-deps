@@ -15,7 +15,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 ```
 
-## [Unreleased] - YYYY-MM-DD
+## [Unreleased]
+
+### Deprecated
+- **ENTIRE REPOSITORY DEPRECATED**: This repository has been consolidated into [make-bowerbird-core](https://github.com/asikros/make-bowerbird-core)
+- All functionality from make-bowerbird-deps has been integrated into make-bowerbird-core
+- New projects should use make-bowerbird-core instead
+- Existing projects should migrate to make-bowerbird-core for continued support and updates
+- See [migration guide](https://github.com/asikros/make-bowerbird-core#migration-from-deps--libs) for upgrade instructions
+
+### Changed
+- Added deprecation error message to `bowerbird.mk` entry point
+- Updated README with deprecation notice and migration instructions
+
+---
+
+## [Previous Changes]
 
 ### Added
 - Created tests for the makefile work directory variables.
@@ -122,3 +137,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Created a README with usage example.
 - Migrated the bash build recipes to a separate repo.
+
+[Unreleased]: https://github.com/asikros/make-bowerbird-deps/commits/main

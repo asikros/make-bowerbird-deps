@@ -10,7 +10,7 @@ See **[Proposal Lifecycle and Guidelines](https://github.com/asikros/make-bowerb
 
 Proposals under active development:
 
-_(None yet)_
+- **[02-bowerbird-loader.md](draft/02-bowerbird-loader.md)** - Simplified bootstrapping with automatic bowerbird-deps and bowerbird-libs loading
 
 ## Accepted
 

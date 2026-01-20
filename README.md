@@ -2,6 +2,13 @@
 
 [![Makefile CI](https://github.com/asikros/make-bowerbird-deps/actions/workflows/makefile.yml/badge.svg)](https://github.com/asikros/make-bowerbird-deps/actions/workflows/makefile.yml)
 
+> **⚠️ DEPRECATED: This repository has been consolidated into [make-bowerbird-core](https://github.com/asikros/make-bowerbird-core).**
+>
+> **Do not use this repository for new projects.** All functionality from `make-bowerbird-deps` and `make-bowerbird-libs` has been merged into `make-bowerbird-core`, which provides a unified, simplified API with better error handling and additional features.
+>
+> **Migration:** See the [make-bowerbird-core migration guide](https://github.com/asikros/make-bowerbird-core#migration-from-deps--libs) for instructions on updating existing projects.
+
+---
 
 ## Usage
 
